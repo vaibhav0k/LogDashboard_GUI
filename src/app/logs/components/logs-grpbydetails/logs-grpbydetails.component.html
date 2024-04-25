@@ -1,0 +1,134 @@
+<div class="row" *ngIf="showsecondfilter">
+  <div style="display:flex; justify-content: center; align-items: center;">
+    <button *ngIf="!isExpand" style="color: white; background-color: #023047 " id="expandBtn" type="button" class="btn btn-light" (click)="toggleCollapse()"> {{ 'Add Filter' | translate }}
+    </button>
+    <button *ngIf="isExpand" style="color: white; background-color: #023047 " id="expandBtn" type="button" class="btn btn-light" (click)="toggleCollapse()">
+      <i class='bi bi-caret-up-fill'></i>
+    </button>
+  </div>
+  <div class="col-md-6 mx-auto mt-2">
+
+
+    <div id="myCollapsibleDiv" class="collapse" [ngClass]="{ show: isExpand }">
+      <!-- content of the collapsible div goes here -->
+
+      <div class="form-group mt-3">
+        <div class="form-group">
+          <label i18n for="filterBy">{{ 'FilterBy' | translate }}:</label>
+          <select class="form-control" id="filterBy" #filterBy>
+            <option value="applicationname">{{ 'Application Name' | translate }}</option>
+            <option value="source">{{ 'Source' | translate }}</option>
+            <option value="statuscode">{{ 'Status Code' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="inputValue">{{ 'Input Value' | translate }}:</label>
+          <input type="text" class="form-control" id="inputValue" #inputValue [placeholder]="'Placeholder' | translate" required>
+          <span class="hidden-span" hidden style="color:red">{{ 'Validationmsg' | translate }}</span>
+        </div>
+
+        <div style="margin:auto">
+          <button (click)="addFilter(filterBy.value, inputValue.value)" class="btn btn-primary">
+            {{ 'Add Filter' | translate }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="filter-container mt-1" style="display:flex;justify-content:center; align-items:center">
+    <div *ngFor="let filter of filters; let i = index" class="filter-item bg-light p-2 mb-2 rounded">
+      <span class="filter-text">{{ filter.property }} = {{ filter.value }}</span>
+      <ng-container *ngIf="i === filters.length - 1">
+        <button (click)="removeFilter(i)" class="btn btn-danger btn-sm ms-2">X</button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<!--<h3 *ngIf="showselectext" style="color:red;text-align:center"> Please Select an option </h3>-->
+<div class="row">
+  <h3 class="text-center text-danger mt-3" *ngIf="showsecondfilter && filterlogs.length == 0">{{ 'NoinfoforAppliedFilters_One' | translate }}</h3>
+  <h3 class="text-center text-danger mt-3" *ngIf="showsecondfilter && filterlogs.length == 0">{{ 'NoinfoforAppliedFilters_Two' | translate }}</h3>
+
+  <div *ngIf="showTable2 && filterlogs.length > 0" class="col-md-12 mx-auto mt-3">
+
+    <div class="flex-container" style="display: flex; flex-wrap: wrap; justify-content: center;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 15px; margin-bottom: 1rem;">
+        <span style="display: flex; align-items: center; margin: 0 auto;">
+          <label for="searchEvents" style="margin-right: 0.5rem;">{{'Search'|translate}}:</label>
+          <input type="search" name="searchEvents" id="searchEvents" [placeholder]="'SearchPlaceholder' | translate" class="form-control form-control-sm mr-2" style="flex: 0 0 200px;margin-right: 0.5rem;" [(ngModel)]="searchEventcharactersTable" (keydown)="changePageNumber()">
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 15px; margin-bottom: 1rem;">
+        <span style="display: flex; align-items: center; margin: 0 auto;">
+          <label for="itemsPerPage" style="margin-right: 0.5rem;">{{ 'IPR' | translate }}:</label>m
+          <input type="number" id="itemsPerPage" [(ngModel)]="totalItemsPerPage" (input)="validateInput($event)" class="form-control form-control-sm mr-2" style="width: 100px;margin-right:0.5rem" (keydown)="changePageNumber()">
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 15px; margin-bottom: 1rem;">
+        <span>
+          <button class="btn btn-info btn-sm" (click)="downloadCSV()">
+            <span class="bi bi-download"></span> {{ 'Download' | translate }}
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="table-responsive mt-3" style="padding: 15px;" *ngIf="showTable2">
+      <table class="table table-bordered table-striped table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>{{ 'Id' | translate }}</th>
+            <th>{{ 'Status Code' | translate }}</th>
+            <th>{{ 'Message' | translate }}</th>
+            <th>{{ 'Source' | translate }}</th>
+            <th>{{ 'Severity' | translate }}</th>
+            <th>{{ 'Application Name' | translate }}</th>
+            <th>{{ 'Timestamp' | translate }}</th>
+            <th>{{ 'Actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of filterLogsByMessage() | paginate: { itemsPerPage: totalItemsPerPage, currentPage: CurrentPage }" class="table-row">
+            <td>{{ log.id }}</td>
+            <td>{{ log.statusCode }}</td>
+            <td>{{ log.message }}</td>
+            <td>{{ log.source }}</td>
+            <td>{{ log.severity }}</td>
+            <td>{{ log.applicationName }}</td>
+            <td>{{ log.timestamp | date }}</td>
+            <td>
+              <button type="button" class="btn btn-info" (click)="showStackTrace(log.stackTrace)" data-bs-toggle="modal" data-bs-target="#myModal">
+                <i class="fas fa-eye"></i> {{ 'VST' | translate }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center mt-3">
+      <pagination-controls (pageChange)="CurrentPage = $event"></pagination-controls>
+    </div>
+  </div>
+</div>
+<h4 *ngIf="selectedlogforst">{{selectedlogforst.stackTrace}}</h4>
+<!-- Popup modal for displaying stack trace -->
+<div id="myModal" class="modal fade modal-lg" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ 'ST' | translate }}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="scrollable-content">
+          <pre>{{ selectedStackTrace }}</pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">{{ 'Close' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>

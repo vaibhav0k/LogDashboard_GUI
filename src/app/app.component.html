@@ -1,0 +1,5 @@
+
+<app-nav-bar></app-nav-bar>
+<!--This is to avoid reload during acquireTokenSilent() because of hidden iframe -->
+<br/>
+<router-outlet *ngIf="!isIframe"></router-outlet>

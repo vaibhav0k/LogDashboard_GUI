@@ -1,0 +1,106 @@
+  <div class="flex-container" style="margin-inline: 1rem">
+    <div class="col-md-6 mx-auto mt-2">
+      <div class="form-group">
+        <label style="font-weight: bold;">{{'GroupBy'|translate}}:</label>
+        <div class="radio-buttons">
+          <input type="radio" id="applicationname" name="filter" value="applicationname" (change)="displaySelectedValue($event)">
+          <label for="applicationname">{{'Application Name'|translate}}</label>
+
+          <input type="radio" id="source" name="filter" value="source" (change)="displaySelectedValue($event)">
+          <label for="source">{{'Source'|translate}}</label>
+
+          <input type="radio" id="statuscode" name="filter" value="statuscode" (change)="displaySelectedValue($event)">
+          <label for="statuscode">{{'Status Code'|translate}}</label>
+
+          <input type="radio" id="allexceptions" name="filter" value="allexceptions" (change)="displaySelectedValue($event)">
+          <label for="allexceptions">{{'All Exception'|translate}}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="col" *ngIf="showalllogs" style="padding: 15px;">
+    <label for="logCount" class="form-label">{{'Selectlogslabel'|translate}}:</label>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{'SelectorEnter'|translate}}
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" (click)="selectedLogCount=10; showSelectedLogs()">10</a>
+          <a class="dropdown-item" (click)="selectedLogCount=100; showSelectedLogs()">100</a>
+          <a class="dropdown-item" (click)="selectedLogCount=1000; showSelectedLogs()">1000</a>
+        </div>
+      </div>
+      <input type="text" class="form-control form-control-sm" id="logCount"  [placeholder]="'NumberPlaceholder' | translate" [(ngModel)]="selectedLogCount" style=" margin-right: 0.5rem; width: 50px;">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="button" (click)="filterLogsBySearchTerm()" style="height: 38px; margin-right: 0.5rem;">{{'ShowSelectedBtn'|translate}}</button>
+        <button class="btn btn-secondary" type="button" (click)="showAllLogs();filterLogsBySearchTerm()" style="height: 38px;">{{'ShowAllBtn'|translate}}</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showalllogs" style="border: 1px solid #ccc; background-color: #f9f9f9; margin: 15px; padding: 10px;">
+    <span style="display: flex; align-items: center; margin-bottom: 10px; justify-content:center">
+      <label for="searchLogs" style="margin-right: 10px; font-weight: bold;">{{'Search'|translate}}:</label>
+      <input type="search" name="searchLogs" id="searchLogs" [placeholder]="'SearchPlaceholder' | translate" class="form-control form-control-sm" style="width: 200px;  margin-right: 10px;" [(ngModel)]="searchEventcharacters">
+    </span>
+    <div style="overflow-y: scroll; height: 22rem;">
+      <div class="content mx-3">
+        <div style="display: flex; flex-wrap: wrap; justify-content:center">
+          <div *ngFor="let log of filterLogsBySearchTerm(); let i = index">
+            <div class="card card-bd mb-3" [style.background-color]="cardColors[i]" style="margin:10px"
+                 [ngClass]="{'highlighted': selectedLog === log}" (click)="toggleTable(log)">
+              <div class="bg-secondary card-border"></div>
+              <div class="card-body box-style">
+                <div class="media align-items-center">
+                  <div class="media-body me-3">
+                    <h4 class="card-title"><strong>{{ log.message }}</strong></h4>
+                    <p class="card-text"><strong>{{'Source'|translate}}:</strong> {{ log.source }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+  <div *ngIf="showfilterlogs" style="border: 1px solid #ccc; background-color: #f9f9f9; margin: 15px; padding: 10px;">
+    <span style="display: flex; align-items: center; margin-bottom: 10px; justify-content:center">
+      <label for="searchLogs" style="margin-right: 10px; font-weight: bold;">{{'Search'|translate}}:</label>
+      <input type="search" name="searchLogs" id="searchLogs" [placeholder]="'SearchPlaceholder' | translate" class="form-control form-control-sm" style="width: 200px;margin-right: 10px;" [(ngModel)]="searchEventcharacters">
+    </span>
+    <div style="overflow-y: scroll; height: 22rem;">
+      <div class="content mx-3">
+        <div style="display: flex; flex-wrap: wrap; justify-content:safe center">
+          <div *ngFor="let grpcnt of filterGroupByTerm(); let i = index">
+            <div class="card card-bd mb-3" [style.background-color]="cardColors[i]"
+                 [ngClass]="{'highlighted': selectedgrp === grpcnt}" style="margin:8px" (click)="togglefilter(grpcnt,i)">
+              <div class="bg-secondary card-border"></div>
+              <div class="card-body box-style">
+                <div class="media align-items-center">
+                  <div class="media-body me-3">
+                    <h4 class="card-title"><strong>{{ grpcnt.groupName }}</strong></h4>
+                    <p class="card-text"><strong>{{'Count'|translate}}:</strong> {{ grpcnt.count }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="grpname && index !== -1">
+    <app-logs-grpbydetails [grpname]="grpname" [index]="index" [selectedoption]="selectedoption"  [filterStack]="filterStackArray | async"
+                           [logs]="logs" [filterlogs]="filterlogs" [showsecondfilter]="showsecondfilter"
+                           [showTable2]="showTable2" [isExpand]="isExpand" [filters]="filters"></app-logs-grpbydetails>
+  </ng-container>
+
+  <ng-container *ngIf="showTable && selectedLog">
+    <app-logs-details [showTable]="showTable" [selectedLog]="selectedLog"></app-logs-details>
+  </ng-container>

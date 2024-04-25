@@ -1,0 +1,55 @@
+<div class="row">
+  <div class="col-md-12 mx-auto mt-5">
+    <div class="table-responsive" style="padding: 15px;">
+      <table class="table table-bordered table-striped">
+        <thead class="table-light">
+          <tr>
+            <th>{{ 'Id' | translate }}</th>
+            <th>{{ 'Status Code' | translate }}</th>
+            <th>{{ 'Message' | translate }}</th>
+            <th>{{ 'Source' | translate }}</th>
+            <th>{{ 'Severity' | translate }}</th>
+            <th>{{ 'Application Name' | translate }}</th>
+            <th>{{ 'Timestamp' | translate }}</th>
+            <th>{{ 'Actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> {{selectedLog.id}}</td>
+            <td> {{selectedLog.statusCode}} </td>
+            <td> {{selectedLog.message}} </td>
+            <td> {{selectedLog.source}} </td>
+            <td> {{selectedLog.severity}} </td>
+            <td> {{selectedLog.applicationName}} </td>
+            <td> {{selectedLog.timestamp}} </td>
+            <td>
+              <button type="button" class="btn btn-info" (click)="showStackTrace(selectedLog.stackTrace)" data-bs-toggle="modal" data-bs-target="#myModal">
+                <i class="fas fa-eye"></i> View Stack Trace
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<h4 *ngIf="selectedlogforst">{{selectedlogforst.stackTrace}}</h4>
+<!-- Popup modal for displaying stack trace -->
+<div id="myModal" class="modal fade modal-lg" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ 'ST' | translate }}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="scrollable-content">
+          <pre>{{ selectedStackTrace }}</pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">{{ 'Close' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>
